@@ -4,14 +4,13 @@ import { authMiddleware, roleMiddleware } from '../middleware/auth.middleware';
 
 const router = new Hono();
 
+// Public - Get all teachers
 router.get('/', teacherController.getAllTeachers);
+
+// Public - Get single teacher
 router.get('/:id', teacherController.getTeacherById);
-router.get('/:id/availability', teacherController.getTeacherAvailability);
 
-router.use('*', authMiddleware);
-router.use('*', roleMiddleware(['TEACHER', 'ADMIN']));
-
-router.post('/profile', teacherController.updateTeacherProfile);
-router.post('/availability', teacherController.setAvailability);
+// Protected - Update own teacher profile
+router.put('/profile', authMiddleware, roleMiddleware(['TEACHER']), teacherController.updateTeacherProfile);
 
 export default router;

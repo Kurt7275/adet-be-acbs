@@ -4,10 +4,10 @@ import { authMiddleware, roleMiddleware } from '../middleware/auth.middleware';
 
 const router = new Hono();
 
-router.use('*', authMiddleware);
-router.use('*', roleMiddleware(['STUDENT', 'ADMIN']));
+// Protected - Get my profile
+router.get('/me', authMiddleware, roleMiddleware(['STUDENT']), studentController.getMyProfile);
 
-router.get('/profile', studentController.getStudentProfile);
-router.post('/profile', studentController.updateStudentProfile);
+// Protected - Update my profile
+router.put('/me', authMiddleware, roleMiddleware(['STUDENT']), studentController.updateMyProfile);
 
 export default router;

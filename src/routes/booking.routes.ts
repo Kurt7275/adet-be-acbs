@@ -4,15 +4,22 @@ import { authMiddleware, roleMiddleware } from '../middleware/auth.middleware';
 
 const router = new Hono();
 
-router.use('*', authMiddleware);
+// CREATE booking (students only)
+router.post('/', authMiddleware, roleMiddleware(['STUDENT']), bookingController.createBooking);
 
-router.post('/', bookingController.createBooking);
-router.get('/', bookingController.getMyBookings);
-router.get('/:id', bookingController.getBookingById);
-router.patch('/:id/cancel', bookingController.cancelBooking);
+// GET my bookings
+router.get('/', authMiddleware, bookingController.getMyBookings);
 
-router.use('*', roleMiddleware(['TEACHER', 'ADMIN']));
-router.patch('/:id/approve', bookingController.approveBooking);
-router.patch('/:id/reject', bookingController.rejectBooking);
+// GET single booking
+router.get('/:id', authMiddleware, bookingController.getBookingById);
+
+// APPROVE booking (teachers only)
+router.patch('/:id/approve', authMiddleware, roleMiddleware(['TEACHER']), bookingController.approveBooking);
+
+// REJECT booking (teachers only)
+router.patch('/:id/reject', authMiddleware, roleMiddleware(['TEACHER']), bookingController.rejectBooking);
+
+// CANCEL booking (students only)
+router.patch('/:id/cancel', authMiddleware, roleMiddleware(['STUDENT']), bookingController.cancelBooking);
 
 export default router;

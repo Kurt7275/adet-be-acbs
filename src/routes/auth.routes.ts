@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import * as authController from '../controllers/auth.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = new Hono();
 
