@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { serve } from '@hono/node-server';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import teacherRoutes from './routes/teacher.routes';
@@ -43,4 +44,7 @@ app.onError(errorHandler);
 const port = process.env.PORT || 3000;
 console.log(`🚀 Server is running on http://localhost:${port}`);
 
-export default app;
+serve({
+  fetch: app.fetch,
+  port: Number(port),
+});

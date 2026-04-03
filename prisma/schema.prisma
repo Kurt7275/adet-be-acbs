@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  firstName String
+  lastName  String
+  role      Role       @default(STUDENT)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  studentBookings  Booking[] @relation("StudentBookings")
+  teacherBookings  Booking[] @relation("TeacherBookings")
+  availabilities   Availability[]
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+model Booking {
+  id                 String   @id @default(cuid())
+  studentId          String
+  student            User     @relation("StudentBookings", fields: [studentId], references: [id])
+  teacherId          String
+  teacher            User     @relation("TeacherBookings", fields: [teacherId], references: [id])
+  consultationDate   DateTime
+  reason             String
+  specialization     String?
+  status             BookingStatus @default(PENDING)
+  googleMeetLink     String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([teacherId])
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+model Availability {
+  id         String   @id @default(cuid())
+  teacherId  String
+  teacher    User     @relation(fields: [teacherId], references: [id])
+  dayOfWeek  Int
+  startTime  DateTime
+  endTime    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([teacherId])
+}
